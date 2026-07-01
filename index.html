@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 3: Data Communications & Networking - DBFP2423</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Macaron Palette */
+            --pastel-pink: #FFD1DC;
+            --pastel-mint: #B0EACD;
+            --pastel-blue: #AEC6CF;
+            --pastel-lavender: #C3B1E1;
+            --pastel-yellow: #FDFD96;
+            
+            --ink: #111111;
+            --ink-muted: #333333;
+            
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --radius-lg: 32px;
+            --radius-md: 16px;
+            
+            --spring: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, var(--pastel-pink), var(--pastel-lavender), var(--pastel-blue), var(--pastel-mint));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--ink);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Auras */
+        body::before {
+            content: ''; position: fixed; top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, var(--pastel-yellow) 0%, transparent 70%);
+            filter: blur(80px); opacity: 0.6; z-index: -1;
+            animation: floatAura 20s ease-in-out infinite alternate;
+        }
+        body::after {
+            content: ''; position: fixed; bottom: -10%; right: -10%; width: 60vw; height: 60vw;
+            background: radial-gradient(circle, var(--pastel-pink) 0%, transparent 70%);
+            filter: blur(100px); opacity: 0.5; z-index: -1;
+            animation: floatAura 25s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatAura {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; color: var(--ink); }
+        
+        .header { text-align: center; padding: 40px 20px 20px; position: relative; }
+        .header h1 { font-size: 2.5rem; margin-top: 20px; font-weight: 800; color: var(--ink); }
+        .nav-link { color: var(--ink-muted); text-decoration: none; font-weight: 700; display: inline-block; transition: all 0.4s var(--spring); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--glass-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); }
+        .nav-link:hover { color: var(--ink); transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: rgba(255,255,255,0.7); }
+        
+        .lang-btn {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            z-index: 10;
+        }
+
+        .container { max-width: 900px; margin: 20px auto 40px; padding: 0 20px; position: relative; z-index: 1; }
+        
+        .card { 
+            background: var(--glass-bg); 
+            border-radius: var(--radius-lg); 
+            padding: 40px; 
+            box-shadow: var(--glass-shadow); 
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            transition: all 0.5s var(--spring);
+        }
+        .card h2 { border-bottom: 2px solid rgba(255,255,255,0.5); padding-bottom: 15px; margin-top: 0; font-size: 1.8rem;}
+        
+        .step { background: rgba(255,255,255,0.3); padding: 20px; margin-bottom: 15px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); }
+        .step h3 { margin-top: 0; font-size: 1.3rem; }
+        
+        .btn { 
+            background: linear-gradient(135deg, var(--pastel-lavender), var(--pastel-pink));
+            color: var(--ink); 
+            padding: 12px 28px; 
+            border: 2px solid rgba(255,255,255,0.8); 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 700; 
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            transition: all 0.4s var(--spring);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .btn:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(195, 177, 225, 0.4); background: linear-gradient(135deg, var(--pastel-pink), var(--pastel-lavender)); }
+        
+        /* Quiz */
+        .quiz-q { margin-bottom: 25px; }
+        .quiz-label { display: block; padding: 12px 16px; cursor: pointer; transition: all 0.4s var(--spring); border-radius: 12px; border: 1px solid transparent; font-weight: 600; font-size: 1.1rem;}
+        .quiz-label:hover { background: rgba(255,255,255,0.4); border: 1px solid var(--glass-border); transform: translateX(5px);}
+        
+        /* Coding */
+        .code-editor { background: rgba(0,0,0,0.8); color: #F8F9FA; padding: 20px; border-radius: var(--radius-md); font-family: 'JetBrains Mono', monospace; line-height: 1.8; margin-top: 10px; font-size: 1rem; border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); white-space: pre-wrap; }
+        .correct-ans { color: #0f5132; font-weight: 700; margin-top: 15px; display: inline-block; padding: 10px 16px; background: rgba(176, 234, 205, 0.6); border-radius: 12px; border: 1px solid var(--pastel-mint);}
+        
+        /* Tips Section override */
+        .card[style*="border-left"] { border-left: none !important; position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(176, 234, 205, 0.3), rgba(255, 255, 255, 0.4)); }
+        .card[style*="border-left"]::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--pastel-mint); box-shadow: 0 0 10px var(--pastel-mint); }
+        .card[style*="border-left"] h2 { border-bottom: none; color: #0f5132; }
+        
+        /* SVG Tweaks for Macaron Glassmorphism & High Contrast */
+        svg { background: transparent !important; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.05)); }
+        svg text { font-family: 'Rajdhani', sans-serif !important; font-weight: 700 !important; fill: #111111 !important; }
+        svg [fill="url(#navyGrad)"] { fill: rgba(255,255,255,0.8) !important; stroke: #111111 !important; stroke-width: 2px; }
+        svg [fill="#FFF"] { fill: rgba(255,255,255,0.8) !important; stroke: #111111 !important; stroke-width: 1px; }
+        svg [stroke="#1E3A8A"] { stroke: #111111 !important; stroke-width: 2px !important; }
+        svg [fill="#1E3A8A"] { fill: #111111 !important; }
+        svg [stroke="#FF6B6B"] { stroke: #D81B60 !important; }
+
+        /* Translation CSS Rules */
+        .lang-cn { display: none !important; }
+        body.cn-active .lang-en { display: none !important; }
+        body.cn-active .lang-cn { display: block !important; }
+        
+        span.lang-cn { display: none !important; }
+        body.cn-active span.lang-en { display: none !important; }
+        body.cn-active span.lang-cn { display: inline !important; }
+
+        @media (max-width: 768px) {
+            .lang-btn {
+                position: static;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="nav-link">
+            <span class="lang-en">← Back to Hub</span>
+            <span class="lang-cn">← 返回主页</span>
+        </a>
+        <h1>
+            <span class="lang-en">Week 3: Data Communications & Networking</span>
+            <span class="lang-cn">第 3 周：数据通信与网络</span>
+        </h1>
+        <button class="btn lang-btn" onclick="toggleLanguage()">🌐 EN / 中文</button>
+    </div>
+
+    <div class="container">
+        <!-- Notes Section -->
+        <div class="card">
+            <h2>
+                <span class="lang-en">Core Concepts</span>
+                <span class="lang-cn">核心概念</span>
+            </h2>
+            <div class="lang-en">
+                <div class='step'><h3>1. Data Communications & Networking in Business</h3><p>Data communication is the exchange of data between devices via transmission media (e.g., cables, fiber, wireless). In today's business application systems, networking allows centralization of data, resource sharing (printers, databases), and supports enterprise apps like ERP and CRM. Key components include senders, receivers, messages, transmission media, and protocols (e.g., TCP/IP).</p></div>
+                <div class='step'><h3>2. Convergence & Unified Communications</h3><p><strong>Convergence</strong> refers to the merging of previously distinct technologies (voice, data, video) into a single shared network infrastructure (IP-based). <strong>Unified Communications (UC)</strong> takes this further by integrating enterprise communication tools — such as instant messaging, VoIP, video conferencing, and email — into a single seamless user interface, improving business agility and reducing operational costs.</p></div>
+            </div>
+            <div class="lang-cn">
+                <div class='step'><h3>1. 商业中的数据通信与网络</h3><p>数据通信是设备之间通过传输介质（如电缆、光纤、无线）进行数据交换的过程。在当今的商业应用系统中，网络允许数据集中化、资源共享（打印机、数据库），并支持 ERP 和 CRM 等企业应用。关键组件包括发送方、接收方、消息、传输介质和协议（如 TCP/IP）。</p></div>
+                <div class='step'><h3>2. 融合与统一通信</h3><p><strong>融合</strong>是指将以前独立的技术（语音、数据、视频）合并到一个共享的网络基础设施（基于 IP）中。<strong>统一通信 (UC)</strong> 进一步将企业通信工具（如即时通讯、VoIP、视频会议和电子邮件）集成到一个无缝的用户界面中，从而提高业务敏捷性并降低运营成本。</p></div>
+            </div>
+        </div>
+
+        <!-- SVG Animation Section -->
+        <div class="card">
+            <h2>
+                <span class="lang-en">Concept Visualization: Convergence</span>
+                <span class="lang-cn">概念可视化：融合</span>
+            </h2>
+            <div style="background: rgba(255,255,255,0.5); border-radius: 8px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.8);">
+                <svg height="250" max-width="600" viewbox="0 0 600 250" width="100%" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="navyGrad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#1E3A8A"></stop>
+<stop offset="100%" stop-color="#0A192F"></stop>
+</lineargradient>
+</defs>
+<!-- Inputs -->
+<rect fill="url(#navyGrad)" height="40" rx="10" width="100" x="20" y="30"></rect>
+<text fill="#FFF" font-family="Outfit" font-size="12" font-weight="bold" text-anchor="middle" x="70" y="55">Voice</text>
+<rect fill="url(#navyGrad)" height="40" rx="10" width="100" x="20" y="105"></rect>
+<text fill="#FFF" font-family="Outfit" font-size="12" font-weight="bold" text-anchor="middle" x="70" y="130">Data</text>
+<rect fill="url(#navyGrad)" height="40" rx="10" width="100" x="20" y="180"></rect>
+<text fill="#FFF" font-family="Outfit" font-size="12" font-weight="bold" text-anchor="middle" x="70" y="205">Video</text>
+<!-- Converged Network -->
+<rect fill="url(#navyGrad)" height="80" rx="40" width="160" x="220" y="85"></rect>
+<text fill="#FFF" font-family="Outfit" font-size="14" font-weight="bold" text-anchor="middle" x="300" y="130">Converged IP Network</text>
+<!-- UC Output -->
+<rect fill="url(#navyGrad)" height="50" rx="25" width="140" x="440" y="100"></rect>
+<text fill="#FFF" font-family="Outfit" font-size="12" font-weight="bold" text-anchor="middle" x="510" y="130">Unified Comms</text>
+<!-- Paths -->
+<path d="M 120 50 L 220 105 M 120 125 L 220 125 M 120 200 L 220 145 M 380 125 L 440 125" fill="none" id="loopPath" stroke="#FF6B6B" stroke-dasharray="5,5" stroke-width="3"></path>
+<circle fill="#FF6B6B" r="6">
+<animatemotion dur="4s" repeatcount="indefinite">
+<mpath href="#loopPath"></mpath>
+</animatemotion>
+</circle>
+</svg>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="card" style="border-left: 5px solid #10B981;">
+            <h2>
+                <span class="lang-en">Tips</span>
+                <span class="lang-cn">提示</span>
+            </h2>
+            <div class="lang-en"><ul>
+<li><strong>Wireshark:</strong> Always select the correct Network Interface Card (NIC) before capturing. Use display filters (e.g., <code>arp</code> or <code>icmp</code>) to reduce noise.</li>
+<li><strong>Packet Tracer:</strong> Ensure you use the correct cable type! Straight-through cables connect different devices (PC to Switch), while crossover cables connect similar devices (PC to PC).</li>
+</ul></div>
+            <div class="lang-cn"><ul><li><strong>Wireshark：</strong>在捕获之前始终选择正确的网络接口卡 (NIC)。使用显示过滤器（例如 <code>arp</code> 或 <code>icmp</code>）来减少噪音。</li><li><strong>Packet Tracer：</strong>确保使用正确的电缆类型！直通线连接不同设备（PC 到交换机），交叉线连接相似设备（PC 到 PC）。</li></ul></div>
+        </div>
+
+        <!-- Practical Exercises: Packet Tracer & Wireshark -->
+        <div class="card">
+            <h2>
+                <span class="lang-en">Practical Exercises (R07)</span>
+                <span class="lang-cn">实践练习 (R07)</span>
+            </h2>
+            
+            <!-- Exercise 1: Cisco Packet Tracer -->
+            <div class='step'>
+                <p><b>
+                    <span class="lang-en">Exercise 1: Cisco Packet Tracer - Two-Node Connection</span>
+                    <span class="lang-cn">练习 1：Cisco Packet Tracer - 双节点连接</span>
+                </b></p>
+                <div class="lang-en"><p>Task: Open Packet Tracer. Drag two PCs (PC0 and PC1) and a Switch to the workspace. Connect them using Copper Straight-Through cables. Assign IP addresses (192.168.1.10 and 192.168.1.11) to the PCs. Ping from PC0 to PC1 to verify connectivity.</p></div>
+                <div class="lang-cn"><p>任务：打开 Packet Tracer。将两台 PC（PC0 和 PC1）和一台交换机拖到工作区。使用铜质直通线连接它们。为 PC 分配 IP 地址（192.168.1.10 和 192.168.1.11）。从 PC0 ping PC1 以验证连通性。</p></div>
+                <div class='code-editor'>C:\> ping 192.168.1.11</div>
+                <button class="btn" onclick="showCodeAns('w3c0')">
+                    <span class="lang-en">Show Result</span>
+                    <span class="lang-cn">显示结果</span>
+                </button>
+                <div class='code-editor' id='code-ans-w3c0' style='display:none;'>Pinging 192.168.1.11 with 32 bytes of data:
+Reply from 192.168.1.11: bytes=32 time=1ms TTL=128
+Reply from 192.168.1.11: bytes=32 time=1ms TTL=128
+Reply from 192.168.1.11: bytes=32 time=1ms TTL=128
+Reply from 192.168.1.11: bytes=32 time=1ms TTL=128
+
+Ping statistics for 192.168.1.11:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)</div>
+            </div>
+
+            <!-- Exercise 2: Wireshark Simple -->
+            <div class='step'>
+                <p><b>
+                    <span class="lang-en">Exercise 2: Wireshark (Simple) - Capture Basic ICMP Frames</span>
+                    <span class="lang-cn">练习 2：Wireshark（简单）- 捕获基本 ICMP 帧</span>
+                </b></p>
+                <div class="lang-en"><p>Task: Start a Wireshark capture on your active interface. Open a command prompt and ping a local device or website (e.g., <code>ping 8.8.8.8</code>). In Wireshark, filter by <code>icmp</code> to observe the request and reply frames.</p></div>
+                <div class="lang-cn"><p>任务：在活动接口上启动 Wireshark 捕获。打开命令提示符并 ping 本地设备或网站（例如 <code>ping 8.8.8.8</code>）。在 Wireshark 中使用 <code>icmp</code> 过滤，观察请求和回复帧。</p></div>
+                <button class="btn" onclick="showCodeAns('w3c1')">
+                    <span class="lang-en">Show Result</span>
+                    <span class="lang-cn">显示结果</span>
+                </button>
+                <div class='code-editor' id='code-ans-w3c1' style='display:none;'>No.  Time      Source           Destination       Protocol Length Info
+1    0.000000  192.168.1.10     8.8.8.8           ICMP      74     Echo (ping) request  id=0x0001, seq=1/256
+2    0.015234  8.8.8.8          192.168.1.10      ICMP      74     Echo (ping) reply    id=0x0001, seq=1/256</div>
+            </div>
+
+            <!-- Exercise 3: Wireshark Intermediate -->
+            <div class='step'>
+                <p><b>
+                    <span class="lang-en">Exercise 3: Wireshark (Intermediate) - Observe HTTP & Ethernet Frames</span>
+                    <span class="lang-cn">练习 3：Wireshark（中等）- 观察 HTTP 和以太网帧</span>
+                </b></p>
+                <div class="lang-en"><p>Task: While capturing, open a web browser and visit a non-secure (HTTP) website if possible, or just filter for <code>http</code>. Stop the capture. Click on an HTTP GET packet. In the packet details pane, expand "Ethernet II" to observe the Source and Destination MAC addresses, and expand "Internet Protocol Version 4" to see the IP addresses.</p></div>
+                <div class="lang-cn"><p>任务：在捕获时，打开浏览器并尽可能访问一个非安全（HTTP）网站，或仅使用 <code>http</code> 过滤。停止捕获。点击 HTTP GET 数据包。在数据包详细信息窗格中，展开“Ethernet II”以观察源和目标 MAC 地址，并展开“Internet Protocol Version 4”查看 IP 地址。</p></div>
+                <button class="btn" onclick="showCodeAns('w3c2')">
+                    <span class="lang-en">Show Result</span>
+                    <span class="lang-cn">显示结果</span>
+                </button>
+                <div class='code-editor' id='code-ans-w3c2' style='display:none;'>Frame 1: 74 bytes on wire (592 bits)
+Ethernet II, Src: Intel_ab:cd:ef (00:1a:2b:3c:4d:5e), Dst: Cisco_12:34:56 (00:50:ba:12:34:56)
+    Destination: Cisco_12:34:56 (00:50:ba:12:34:56)
+    Source: Intel_ab:cd:ef (00:1a:2b:3c:4d:5e)
+    Type: IPv4 (0x0800)
+Internet Protocol Version 4, Src: 192.168.1.10, Dst: 93.184.216.34
+Transmission Control Protocol, Src Port: 54312, Dst Port: 80, Seq: 1, Ack: 1
+Hypertext Transfer Protocol
+    GET / HTTP/1.1\r\n
+    Host: example.com\r\n</div>
+            </div>
+
+            <!-- Exercise 4: Wireshark Critical -->
+            <div class='step'>
+                <p><b>
+                    <span class="lang-en">Exercise 4: Wireshark (Critical) - Convert Raw Code/Encryption to Text</span>
+                    <span class="lang-cn">练习 4：Wireshark（关键）- 将原始代码/加密数据转换为文本</span>
+                </b></p>
+                <div class="lang-en"><p>Task: Sometimes data payloads look like encrypted code or raw hex (e.g., <code>55 73 65 72 6e 61 6d 65</code>). Capture a login attempt on an HTTP site. Right-click the HTTP POST packet and select <strong>Follow → TCP Stream</strong>. Wireshark converts the raw hex code into readable ASCII text, revealing credentials (e.g., <code>user=admin&pass=secret123</code>). This demonstrates why HTTPS encryption is critical!</p></div>
+                <div class="lang-cn"><p>任务：有时数据有效载荷看起来像加密代码或原始十六进制（例如 <code>55 73 65 72 6e 61 6d 65</code>）。在 HTTP 网站上捕获登录尝试。右键单击 HTTP POST 数据包，选择 <strong>Follow → TCP Stream</strong>。Wireshark 会将原始十六进制代码转换为可读的 ASCII 文本，暴露凭据（例如 <code>user=admin&pass=secret123</code>。这说明了为什么 HTTPS 加密至关重要！</p></div>
+                <button class="btn" onclick="showCodeAns('w3c3')">
+                    <span class="lang-en">Show Result</span>
+                    <span class="lang-cn">显示结果</span>
+                </button>
+                <div class='code-editor' id='code-ans-w3c3' style='display:none;'>[Raw Hex Payload captured in Wireshark]:
+55 73 65 72 6e 61 6d 65 3d 61 64 6d 69 6e 26 70 61 73 73 77 6f 72 64 3d 73 65 63 72 65 74 31 32 33
+
+[Converted to Text via Follow TCP Stream]:
+Username=admin&password=secret123
+
+WARNING: Sending data over HTTP exposes raw text. HTTPS (TLS/SSL) encrypts this payload so it cannot be read.</div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="card">
+            <h2>
+                <span class="lang-en">Knowledge Check</span>
+                <span class="lang-cn">知识自测</span>
+            </h2>
+            <div id="quiz-container">
+                <div class='quiz-q'>
+                    <p><b>1. 
+                        <span class="lang-en">What is network convergence?</span>
+                        <span class="lang-cn">什么是网络融合？</span>
+                    </b></p>
+                    <label class='quiz-label'>
+                        <input type='radio' name='q0' value='0'>
+                        <span class="lang-en">Using only wireless networks.</span>
+                        <span class="lang-cn">仅使用无线网络。</span>
+                    </label><label class='quiz-label'>
+                        <input type='radio' name='q0' value='1'>
+                        <span class="lang-en">Merging voice, data, and video onto a single IP network.</span>
+                        <span class="lang-cn">将语音、数据和视频合并到单个 IP 网络上。</span>
+                    </label>
+                </div><div class='quiz-q'>
+                    <p><b>2. 
+                        <span class="lang-en">In Wireshark, which tool is best for converting raw hex payload code into a readable conversation?</span>
+                        <span class="lang-cn">在 Wireshark 中，哪个工具最适合将原始十六进制有效载荷代码转换为可读对话？</span>
+                    </b></p>
+                    <label class='quiz-label'>
+                        <input type='radio' name='q1' value='0'>
+                        <span class="lang-en">Follow TCP Stream</span>
+                        <span class="lang-cn">Follow TCP Stream（跟踪 TCP 流）</span>
+                    </label><label class='quiz-label'>
+                        <input type='radio' name='q1' value='1'>
+                        <span class="lang-en">Capture Options</span>
+                        <span class="lang-cn">Capture Options（捕获选项）</span>
+                    </label>
+                </div><div class='quiz-q'>
+                    <p><b>3. 
+                        <span class="lang-en">When connecting a PC directly to a Switch in Packet Tracer, which cable should you use?</span>
+                        <span class="lang-cn">在 Packet Tracer 中，将 PC 直接连接到交换机时，应使用哪种电缆？</span>
+                    </b></p>
+                    <label class='quiz-label'>
+                        <input type='radio' name='q2' value='0'>
+                        <span class="lang-en">Straight-through cable.</span>
+                        <span class="lang-cn">直通线。</span>
+                    </label><label class='quiz-label'>
+                        <input type='radio' name='q2' value='1'>
+                        <span class="lang-en">Crossover cable.</span>
+                        <span class="lang-cn">交叉线。</span>
+                    </label>
+                </div><div class='quiz-q'>
+                    <p><b>4. 
+                        <span class="lang-en">Unified Communications (UC) integrates:</span>
+                        <span class="lang-cn">统一通信 (UC) 集成了：</span>
+                    </b></p>
+                    <label class='quiz-label'>
+                        <input type='radio' name='q3' value='0'>
+                        <span class="lang-en">VoIP, video conferencing, and instant messaging.</span>
+                        <span class="lang-cn">VoIP、视频会议和即时通讯。</span>
+                    </label><label class='quiz-label'>
+                        <input type='radio' name='q3' value='1'>
+                        <span class="lang-en">Only hardware routers and switches.</span>
+                        <span class="lang-cn">仅硬件路由器和交换机。</span>
+                    </label>
+                </div>
+                <button class="btn" onclick="checkQuiz()">
+                    <span class="lang-en">Submit Answers</span>
+                    <span class="lang-cn">提交答案</span>
+                </button>
+                <div id="quiz-result"></div>
+            </div>
+        </div>
+
+        <!-- Matching Game -->
+        <div class="card">
+            <h2>
+                <span class="lang-en">Matching Game</span>
+                <span class="lang-cn">配对游戏</span>
+            </h2>
+            <p>
+                <span class="lang-en">Match the networking term on the left with its definition on the right.</span>
+                <span class="lang-cn">将左侧的网络术语与右侧的定义进行配对。</span>
+            </p>
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                <div style="width: 45%;">
+                    <div class='step' style='padding:10px; cursor:pointer;'>Wireshark</div><div class='step' style='padding:10px; cursor:pointer;'>Unified Communications</div><div class='step' style='padding:10px; cursor:pointer;'>Cisco Packet Tracer</div><div class='step' style='padding:10px; cursor:pointer;'>Convergence</div>
+                </div>
+                <div style="width: 45%;">
+                    <div class='step' style='padding:10px; cursor:pointer;'>
+            <span class="lang-en">Network simulation tool for topologies</span>
+            <span class="lang-cn">用于拓扑的网络模拟工具</span>
+        </div><div class='step' style='padding:10px; cursor:pointer;'>
+            <span class="lang-en">Integration of VoIP, video, and messaging</span>
+            <span class="lang-cn">集成 VoIP、视频和消息传递</span>
+        </div><div class='step' style='padding:10px; cursor:pointer;'>
+            <span class="lang-en">Merging of voice, data, and video networks</span>
+            <span class="lang-cn">语音、数据和视频网络的合并</span>
+        </div><div class='step' style='padding:10px; cursor:pointer;'>
+            <span class="lang-en">Protocol analyzer for packet capturing</span>
+            <span class="lang-cn">用于数据包捕获的协议分析器</span>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleLanguage() {
+            document.body.classList.toggle('cn-active');
+        }
+
+        function checkQuiz() {
+            let score = 0;
+            
+        const q0 = document.querySelector('input[name="q0"]:checked');
+        if (q0 && parseInt(q0.value) === 1) score++;
+        
+        const q1 = document.querySelector('input[name="q1"]:checked');
+        if (q1 && parseInt(q1.value) === 0) score++;
+        
+        const q2 = document.querySelector('input[name="q2"]:checked');
+        if (q2 && parseInt(q2.value) === 0) score++;
+        
+        const q3 = document.querySelector('input[name="q3"]:checked');
+        if (q3 && parseInt(q3.value) === 0) score++;
+        
+            document.getElementById('quiz-result').innerHTML = `<span class='correct-ans'>
+                <span class="lang-en">You scored: ${score} / 4</span>
+                <span class="lang-cn">得分：${score} / 4</span>
+            </span>`;
+        }
+
+        function showCodeAns(id) {
+            const el = document.getElementById('code-ans-' + id);
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
